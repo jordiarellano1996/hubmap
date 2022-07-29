@@ -15,7 +15,7 @@ Link: https://www.kaggle.com/competitions/hubmap-organ-segmentation
 </ul>
 
 ## ⚽ Wandb report
-Check results on: 
+Check results on: https://wandb.ai/jordiarellano1996/HuBMAP
 
 ## 🚀 Train set results
 
