@@ -49,3 +49,16 @@ def save_dataset_artifact(artifact_name, path):
     artifact.add_file(path)
     wandb.log_artifact(artifact)
     print("Artifact has been saved successfully.")
+
+
+def create_wandb_image(np_data, caption, mode="RGBA", log=None):
+    """
+    Save wandb image
+    :param np_data: Accepts numpy array of image data, or a PIL image.
+    :param caption: Label for display of image.
+    :param mode: The PIL mode for an image. Most common are "L", "RGB", "RGBA".
+    :param log: string containing name of log
+    :return: None
+    """
+    wdb_img = wandb.Image(np_data, caption=caption, mode=mode)
+    wandb.log({log: wdb_img})
