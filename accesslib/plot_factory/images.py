@@ -5,23 +5,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
-
-
-def read_image(path):
-    """
-    Reads and converts the image.
-    path: the full complete path to the .png file
-    """
-
-    # Read image in a corresponding manner
-    # convert int16 -> float32
-    image = cv2.imread(path, cv2.IMREAD_UNCHANGED).astype('float32')
-    # Scale to [0, 255]
-    image = cv2.normalize(image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-    image = image.astype(np.uint8)
-    if len(image.shape) == 2:
-        image = image[:, :, np.newaxis]
-    return image
+from accesslib.segmentation_precompute.read_image import read_image
 
 
 def show_img(img, mask=None, mask_labels: list = None, fig_size=(10, 10)):
@@ -87,3 +71,40 @@ def show_img_canvas(img, mask=None, mask_labels: list = None, fig_size=(10, 10))
     plt.axis('off')
     plt.tight_layout()
     return fig
+
+
+def check_patches(patches_paths, mask_patches_paths, xy_shape=(6, 6), fig_size=(20, 20)):
+    cmap = LinearSegmentedColormap.from_list("", ["red", "red"])
+
+    f, axarr = plt.subplots(xy_shape[0], xy_shape[1], figsize=fig_size)
+    i = 0
+    for x in range(xy_shape[0]):
+        for y in range(xy_shape[1]):
+            img = read_image(patches_paths[i])
+            mask = read_image(mask_patches_paths[i])
+            axarr[x, y].imshow(img)
+            axarr[x, y].imshow(mask[:, :, 0], alpha=0.5 * (mask[:, :, 0] / 255), cmap=cmap, aspect='auto')
+            axarr[x, y].axis('off')
+            i += 1
+    plt.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+
+# def read_image(path):
+#     """
+#     Reads and converts the image.
+#     path: the full complete path to the .png file
+#     """
+#
+#     # Read image in a corresponding manner
+#     # convert int16 -> float32
+#     image = cv2.imread(path, cv2.IMREAD_UNCHANGED).astype('float32')
+#     # Scale to [0, 255]
+#     if np.max(image) != np.min(image):
+#         image = cv2.normalize(image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+#
+#     image = image.astype(np.uint8)
+#     if len(image.shape) == 2:
+#         image = image[:, :, np.newaxis]
+#     return image

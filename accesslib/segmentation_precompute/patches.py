@@ -1,9 +1,10 @@
 from patchify import patchify, unpatchify
 import numpy as np
 import cv2
+from functools import reduce
 
 
-class Patcher:
+class ExtractPatches:
     def __init__(self, img, verbose=False):
         self.verbose = verbose
         self.img = img
@@ -42,8 +43,21 @@ class Patcher:
         patches = patchify(self.img, (patch_height, patch_width, self.img.shape[2]), step=step)
         return patches
 
-    def reconstruct_from_patches(self, patches):
-        """
-        Reconstruct the image from all of its patches.
-        """
-        return unpatchify(patches, self.img.shape)
+
+class ExtractPatchesFlat(ExtractPatches):
+    def __init__(self, img, verbose=False):
+        super().__init__(img, verbose)
+
+    def extract(self, patch_height, patch_width, step=1):
+        out_patch_img = self.extract_patches(patch_height, patch_width, step)
+        s = out_patch_img.shape
+        p_len = reduce(lambda x, y: x * y, s[:3])
+        reshape_out_patch_img = out_patch_img.reshape((p_len, s[-3:][0], s[-3:][1], s[-3:][2]))
+        return reshape_out_patch_img, s
+
+
+def reconstruct_from_patches(patches, image_shape):
+    """
+    Reconstruct the image from all of its patches.
+    """
+    return unpatchify(patches, image_shape)
