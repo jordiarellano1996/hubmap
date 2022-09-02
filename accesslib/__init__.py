@@ -12,9 +12,9 @@ class CFG:
         base_path = "/mounted/input"
     print(f"base_path: {base_path}")
     epochs_path = base_path + "/models"
-    img_size = (320, 384)
+    img_size = (512, 512, 3)
     batch_size = 64
-    epochs = 60
+    epochs = 3
     n_fold = 5
 
 

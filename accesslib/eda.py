@@ -110,14 +110,14 @@ if __name__ == "__main__":
     scatter_img = scatter()
     images.show_img(scatter_img)
 
-    """ Tiff images show."""
+    """ 🤫 Tiff images show."""
     organ = 'lung'
     sub_df = train[train.organ == organ].sample(1)
     img = read_image(sub_df.iloc[[0, ]]["img_path"].values[0])
     mask = read_image(sub_df.iloc[[0, ]]["mask_path"].values[0])
     images.show_img(img, mask=mask, mask_labels=[organ, ], fig_size=(20, 20))
 
-    """ Tiff images show."""
+    """ 🤫 Tiff images show."""
     # MAX_N_FTU = 8
     # N_EX = 10
     # ORGANS = ['kidney', 'largeintestine', 'lung', 'prostate', 'spleen']
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     #
     # del out_img, imgs, cnts, sub_df, ftu_crops, MAX_N_FTU, N_EX
 
-    """ Check patches consistency """
+    """ 🤫 Check patches consistency """
     t_df = train.iloc[[134]]  # pos:134, id:22236, pos:8, id:10703
 
     # Original image
@@ -149,17 +149,16 @@ if __name__ == "__main__":
     xy_shape = t_df.patch_shape.values[0][:2]
     images.check_patches(patches_paths, pmask_paths, xy_shape=xy_shape)
 
-    """ Check data generator consistency"""
+    """ 🤫 Check data generator consistency"""
     patch_paths = []
     pmask_paths = []
     for pos in range(len(train.patches_path)):
-        for p_path in train.patches_path.values[pos]:
-            patch_paths.append(p_path)
-        for pm_path in train.pmask_path.values[pos]:
-            pmask_paths.append(pm_path)
+        for p_index in train.pmask_consistency.values[pos]:
+            patch_paths.append(train.patches_path.values[pos][p_index])
+            pmask_paths.append(train.pmask_path.values[pos][p_index])
 
     gen = data_loader.DataGenerator(patch_paths, pmask_paths, batch_size=32, shuffle=True, augment=False, )
-    for x, y in gen:
-        print(x.shape, y.shape)
+    x, y = gen[22]
+    print(x.shape, y.shape)
 
-    images.show_img(x[4].astype(np.uint8), y[4].astype(np.uint8), mask_labels=["organ"])
+    images.show_img((x[5]*255).astype('uint8'), (y[5]*255).astype('uint8'), mask_labels=["organ"])

@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from accesslib.segmentation_precompute.patches import ExtractPatchesFlat
 from accesslib.segmentation_precompute.read_image import read_image, img_rescale
+from accesslib.segmentation_precompute.augmentations import random_transform
 
 IMG_SIZE = (500, 500, 3)
 
@@ -49,8 +50,16 @@ class DataGenerator(tf.keras.utils.Sequence):
 
         k = 0
         for index in indexes:
+            # Read
             img = read_image(self.img_paths[index])
             mask = read_image(self.mask_paths[index])
+            # Augment
+            if self.augment:
+                img, mask = random_transform(img, mask)
+            # Rescale
+            img = img_rescale(img)
+            mask = img_rescale(mask)
+            # Save
             x[k] = img
             y[k] = mask
             k += 1
