@@ -1,4 +1,8 @@
+import sys
 import os
+
+sys.path.append("/mounted/hubmap")
+
 import pandas as pd
 from accesslib import CFG
 from accesslib.data_loader import DataGenerator
@@ -13,19 +17,19 @@ from sklearn.model_selection import StratifiedKFold
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
 
-def get_patches(df):
+def get_patches(df_in):
     patch_paths = []
     pmask_paths = []
-    for pos in range(len(df.patches_path)):
-        for p_index in df.pmask_consistency.values[pos]:
-            patch_paths.append(df.patches_path.values[pos][p_index])
-            pmask_paths.append(df.pmask_path.values[pos][p_index])
+    for pos in range(len(df_in.patches_path)):
+        for p_index in df_in.pmask_consistency.values[pos]:
+            patch_paths.append(df_in.patches_path.values[pos][p_index])
+            pmask_paths.append(df_in.pmask_path.values[pos][p_index])
 
     return patch_paths, pmask_paths
 
 
-def replace_path(str_path_list, old_path, new_path):
-    return [path.replace(old_path, new_path) for path in str_path_list]
+def replace_path(str_path_list, old_paths, new_path):
+    return [path.replace(old_paths, new_path) for path in str_path_list]
 
 
 if __name__ == "__main__":
@@ -57,7 +61,7 @@ if __name__ == "__main__":
     train_patch_paths, train_pmask_paths = get_patches(train)
     val_patch_paths, val_train_pmask_paths = get_patches(validation)
 
-    # Change directory
+    # 🚀 Change directory
     print(f"The actual path is: {cfg.base_path}")
     old_path = "/home/titoare/Documents/ds/hubmap/kaggle/input/hubmap-organ-segmentation"
     train_patch_paths = replace_path(train_patch_paths, old_path, cfg.base_path)

@@ -10,7 +10,7 @@ class CFG:
     if len(os.getcwd().split("/")) > 4:
         base_path = "/home/titoare/Documents/ds/hubmap/kaggle/input/hubmap-organ-segmentation"
     else:
-        base_path = "/mounted/input"
+        base_path = "/mounted/hubmap-organ-segmentation"
     print(f"base_path: {base_path}")
     epochs_path = base_path + "/models"
     img_size = (512, 512, 3)
