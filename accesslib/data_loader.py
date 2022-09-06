@@ -22,6 +22,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.augment = augment
         # Model.fit in each epoch it may create again the class so "self.on_epoch_end()" should be called in each epoch.
         self.indexes = None
+        self.path_store = {}
         self.on_epoch_end()
 
     def __len__(self):
@@ -32,6 +33,9 @@ class DataGenerator(tf.keras.utils.Sequence):
     def __getitem__(self, index):
         """Generate one batch of data"""
         indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
+        img_p = np.array(self.img_paths)[indexes]
+        mask_p = np.array(self.mask_paths)[indexes]
+        self.path_store[index] = {"img": img_p, "mask": mask_p}
         x, y = self.__data_generation(indexes)
 
         return x, y

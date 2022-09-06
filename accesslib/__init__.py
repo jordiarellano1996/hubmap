@@ -4,7 +4,8 @@ import os
 class CFG:
     seed = 25
     debug = False  # set debug=False for Full Training
-    wandb_test_name = "test_bce_loss"
+    wandb_callback_flag = True
+    wandb_test_name = "no_augmentation_half_unet"
     debug_cases = 3
     if len(os.getcwd().split("/")) > 4:
         base_path = "/home/titoare/Documents/ds/hubmap/kaggle/input/hubmap-organ-segmentation"
@@ -14,8 +15,8 @@ class CFG:
     epochs_path = base_path + "/models"
     img_size = (512, 512, 3)
     batch_size = 64
-    epochs = 3
-    n_fold = 5
+    epochs = 100
+    n_fold = 7
 
 
 __version__ = "unknown"
