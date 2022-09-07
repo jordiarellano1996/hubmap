@@ -14,7 +14,7 @@ class CFG:
     print(f"base_path: {base_path}")
     epochs_path = base_path + "/models"
     img_size = (512, 512, 3)
-    batch_size = 32
+    batch_size = 64
     epochs = 100
     n_fold = 7
 

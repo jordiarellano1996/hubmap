@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     """ 🤫 Generate patches for images """
     # Train images data
-    patch_size = (500, 500)
+    patch_size = (512, 512)
     train.insert(5, "patches_path", train["img_path"])
     train["patches_path"].replace(["/train_images", ], ["/train_patches", ], regex=True, inplace=True)
     patches_path_out, new_shapes_out, patch_shapes_out, _ = patches_on_disk(train["img_path"].values,

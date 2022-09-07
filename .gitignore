@@ -154,6 +154,5 @@ fabric.properties
 input/
 wandb/
 train_results/
-*.sh
 *.txt
 

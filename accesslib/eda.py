@@ -118,22 +118,22 @@ if __name__ == "__main__":
     images.show_img(img, mask=mask, mask_labels=[organ, ], fig_size=(20, 20))
 
     """ 🤫 Tiff images show."""
-    # MAX_N_FTU = 8
-    # N_EX = 10
-    # ORGANS = ['kidney', 'largeintestine', 'lung', 'prostate', 'spleen']
-    #
-    # out_img = []
-    # for _organ in ORGANS:
-    #     sub_df = train[train.organ == _organ].sample(N_EX)
-    #     imgs = [read_image(sub_df.iloc[[pos, ]]["img_path"].values[0]) for pos in range(N_EX)]
-    #     cnts = [load_json_to_dict(sub_df.iloc[[pos, ]]["lbl_path"].values[0]) for pos in range(N_EX)]  # image contour
-    #     ftu_crops = flatten_l_o_l([crop_ftu_polygons(img, _cnts, pad=0) for img, _cnts in zip(imgs, cnts)])[:MAX_N_FTU]
-    #     print(f"\n\n\n... DISPLAYING {len(ftu_crops)} {_organ} FTU CROPS ...\n")
-    #     _img = plot_ftus(ftu_crops, organ=_organ)
-    #     images.show_img(_img, fig_size=(30, 20))
-    #     out_img.append(_img)
-    #
-    # del out_img, imgs, cnts, sub_df, ftu_crops, MAX_N_FTU, N_EX
+    MAX_N_FTU = 8
+    N_EX = 10
+    ORGANS = ['kidney', 'largeintestine', 'lung', 'prostate', 'spleen']
+
+    out_img = []
+    for _organ in ORGANS:
+        sub_df = train[train.organ == _organ].sample(N_EX)
+        imgs = [read_image(sub_df.iloc[[pos, ]]["img_path"].values[0]) for pos in range(N_EX)]
+        cnts = [load_json_to_dict(sub_df.iloc[[pos, ]]["lbl_path"].values[0]) for pos in range(N_EX)]  # image contour
+        ftu_crops = flatten_l_o_l([crop_ftu_polygons(img, _cnts, pad=0) for img, _cnts in zip(imgs, cnts)])[:MAX_N_FTU]
+        print(f"\n\n\n... DISPLAYING {len(ftu_crops)} {_organ} FTU CROPS ...\n")
+        _img = plot_ftus(ftu_crops, organ=_organ)
+        images.show_img(_img, fig_size=(30, 20))
+        out_img.append(_img)
+
+    del out_img, imgs, cnts, sub_df, ftu_crops, MAX_N_FTU, N_EX
 
     """ 🤫 Check patches consistency """
     t_df = train.iloc[[134]]  # pos:134, id:22236, pos:8, id:10703
@@ -157,7 +157,7 @@ if __name__ == "__main__":
             patch_paths.append(train.patches_path.values[pos][p_index])
             pmask_paths.append(train.pmask_path.values[pos][p_index])
 
-    gen = data_loader.DataGenerator(patch_paths, pmask_paths, batch_size=32, shuffle=True, augment=False, )
+    gen = data_loader.DataGenerator(patch_paths, pmask_paths, batch_size=32, shuffle=True, augment=False,img_size=(512,512,3) )
     x, y = gen[22]
     print(x.shape, y.shape)
 
