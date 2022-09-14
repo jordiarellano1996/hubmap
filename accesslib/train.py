@@ -1,7 +1,9 @@
 import sys
 import os
 
-sys.path.append("~/project/hubmap")
+sys_path = os.path.expanduser('~') + "/project/hubmap"
+print(sys_path)
+sys.path.append(sys_path)
 
 import pandas as pd
 from accesslib import CFG
