@@ -71,9 +71,9 @@ class HalfUnet(UnetBase):
         conv2 = self.conv_block(conv1_out, size=3,  nfilters=self.filters)
         conv2_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv2)
         conv3 = self.conv_block(conv2_out, size=3,  nfilters=self.filters)
-        conv3_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding="same")(conv3)
+        conv3_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv3)
         conv4 = self.conv_block(conv3_out, size=3,  nfilters=self.filters)
-        conv4_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding="same")(conv4)
+        conv4_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv4)
         conv5 = self.conv_block(conv4_out, size=3,  nfilters=self.filters)
 
         # Up
