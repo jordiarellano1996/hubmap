@@ -15,7 +15,7 @@ class CFG:
     epochs_path = "/tmp/model"
     img_size = (512, 512, 3)
     batch_size = 20
-    epochs = 40
+    epochs = 10
     n_fold = 7
 
 
