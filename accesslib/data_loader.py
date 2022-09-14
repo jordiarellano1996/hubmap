@@ -4,14 +4,11 @@ from accesslib.segmentation_precompute.patches import ExtractPatchesFlat
 from accesslib.segmentation_precompute.read_image import read_image, img_rescale
 from accesslib.segmentation_precompute.augmentations import random_transform
 
-IMG_SIZE = (500, 500, 3)
-
 
 class DataGenerator(tf.keras.utils.Sequence):
     """Generates data for Keras"""
 
-    def __init__(self, img_path: list, mask_path: list, batch_size=24, shuffle=False, augment=False
-                 , img_size=IMG_SIZE):
+    def __init__(self, img_path: list, mask_path: list, img_size: tuple, batch_size=24, shuffle=False, augment=False):
 
         assert len(img_path) == len(mask_path)
         self.img_paths = img_path

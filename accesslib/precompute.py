@@ -47,7 +47,8 @@ def patches_on_disk(path_values: list, path_patches_values: list, patch_size, ma
             if mask_consistency_flag:
                 """ This logic is use to check if in the new tiles there is any segmentation marked."""
                 flatten_mask = img.flatten()
-                pct_up = (len(flatten_mask[flatten_mask == 255])/len(flatten_mask))*100  # percentage of pixels at 255.
+                pct_up = (len(flatten_mask[flatten_mask == 255]) / len(
+                    flatten_mask)) * 100  # percentage of pixels at 255.
                 if pct_up > 5:
                     mask_consistency_list.append(img_pos)
             i += 1

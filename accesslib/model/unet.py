@@ -30,6 +30,7 @@ class Unet(UnetBase):
         self.filters = filters
 
     def get_layers(self):
+        # Unet inputs need to be divisible by 2^n, where n is the number of pool operators.
         # Input
         input_layer = Input(shape=(self.img_shape[0], self.img_shape[1], self.img_shape[2]), name='image_input')
         # Down
@@ -67,12 +68,16 @@ class HalfUnet(UnetBase):
 
         conv1 = self.conv_block(input_layer, size=3, nfilters=self.filters)
         conv1_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv1)
+        print(conv1_out.shape, conv1.shape)
         conv2 = self.conv_block(conv1_out, size=3,  nfilters=self.filters)
         conv2_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv2)
+        print(conv2_out.shape, conv2.shape)
         conv3 = self.conv_block(conv2_out, size=3,  nfilters=self.filters)
-        conv3_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv3)
+        conv3_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding="same")(conv3)
+        print(conv3_out.shape, conv3.shape)
         conv4 = self.conv_block(conv3_out, size=3,  nfilters=self.filters)
-        conv4_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv4)
+        conv4_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding="same")(conv4)
+        print(conv4_out.shape, conv4.shape)
         conv5 = self.conv_block(conv4_out, size=3,  nfilters=self.filters)
 
         # Up

@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append("/mounted/hubmap")
+sys.path.append("/project/hubmap")
 
 import pandas as pd
 from accesslib import CFG
@@ -70,10 +70,10 @@ if __name__ == "__main__":
     val_train_pmask_paths = replace_path(val_train_pmask_paths, old_path, cfg.base_path)
 
     # 🚀 Getting generators
-    train_gen = DataGenerator(train_patch_paths, train_pmask_paths, batch_size=cfg.batch_size, shuffle=True,
-                              augment=False, )
-    val_gen = DataGenerator(val_patch_paths, val_train_pmask_paths, batch_size=cfg.batch_size, shuffle=True,
-                            augment=False, )
+    train_gen = DataGenerator(train_patch_paths, train_pmask_paths, img_size=cfg.img_size, batch_size=cfg.batch_size,
+                              shuffle=True, augment=False, )
+    val_gen = DataGenerator(val_patch_paths, val_train_pmask_paths, img_size=cfg.img_size, batch_size=cfg.batch_size,
+                            shuffle=True, augment=False, )
 
     # 🚀 Train
     input_layer, output_layer = HalfUnet(img_shape=cfg.img_size).get_layers()

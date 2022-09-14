@@ -1,7 +1,10 @@
 import os
+from tqdm import tqdm
 import pandas as pd
 import numpy as np
-import cv2
+from accesslib import CFG
+from accesslib.segmentation_precompute.read_image import read_image, img_rescale
+from accesslib.segmentation_precompute.patches import reconstruct_from_patches
 
 
 def rle_encode(img):
@@ -23,31 +26,53 @@ def rle_encode(img):
     return ' '.join(str(x) for x in runs)
 
 
+def replace_path(str_path_list, old_paths, new_path):
+    return [path.replace(old_paths, new_path) for path in str_path_list]
+
+
 if __name__ == "__main__":
-    # Open the training dataframe and display the initial dataframe
-    DATA_DIR = "/kaggle/input/hubmap-organ-segmentation"
-    DATA_DIR = "/home/titoare/Documents/ds/hubmap/kaggle/input/hubmap-organ-segmentation"
+    cfg = CFG()
+    df = pd.read_pickle(os.path.join(cfg.base_path, "train_precompute.csv"))
+    v = np.random.randint(0, 300, size=(15,))
+    df = df.iloc[v]
 
-    # Open the training dataframe and display the initial dataframe
-    TEST_IMAGES_DIR = os.path.join(DATA_DIR, "test_images")
-    TEST_CSV = os.path.join(DATA_DIR, "test.csv")
-    test_df = pd.read_csv(TEST_CSV)
-
-    SS_CSV = os.path.join(DATA_DIR, "sample_submission.csv")
-    ss_df = pd.read_csv(SS_CSV)
-
-    # Rando circle data
-    SMART_CIRCLE_FRAC = 0.8
+    # 🚀 Start loop
+    IMAGE_SIZE = (512, 512, 3)
     rles = []
-    for i, (img_w, img_h) in enumerate(zip(test_df["img_width"], test_df["img_height"])):
-        tmp_img = np.zeros((img_w, img_h))
-        tmp_img = cv2.circle(tmp_img, (int(np.round(img_w / 2)), int(np.round(img_h / 2))),
-                             int(np.round((img_w / 2) * SMART_CIRCLE_FRAC)), 1, -1)
-        rles.append(rle_encode(tmp_img))
+    for pos in tqdm(range(len(df))):
+        df_line = df.iloc[[pos, ]]
 
-    ss_df["rle"] = rles
+        # 🚀 Change directory
+        old_path = "/home/titoare/Documents/ds/hubmap/kaggle/input/hubmap-organ-segmentation"
+        patch_paths = replace_path(df_line.patches_path.values[0], old_path, cfg.base_path)
 
-    # 5. Reduce number of columns (just in case) and save
-    ss_df = ss_df[["id", "rle"]]
-    ss_df.to_csv("submission.csv", index=False)
+        # 🚀 Generate data
+        x = np.zeros((len(patch_paths), IMAGE_SIZE[0], IMAGE_SIZE[1], IMAGE_SIZE[2]), dtype='float32')
+
+        k = 0
+        for index in range(len(patch_paths)):
+            # Read
+            img = read_image(patch_paths[index])
+            # Rescale
+            img = img_rescale(img)
+            # Save
+            x[k] = img
+            k += 1
+
+        # 🚀 Prediction
+        y = x
+
+        # 🚀 Com
+        """ Replace last tuple value with 1"""
+        # patch_shape = tuple(list(df_line.patch_shape.values[0])[:-1] + [1])
+        # new_shape = tuple(list(df_line.new_shape.values[0])[:-1] + [1])
+        patch_shape = df_line.patch_shape.values[0]
+        new_shape = df_line.new_shape.values[0]
+        mask_margins = reconstruct_from_patches(y.reshape(patch_shape), new_shape)
+        mask = mask_margins[:df_line.img_height.values[0], :df_line.img_width.values[0], :]     # y,x, z
+        rles.append(rle_encode(mask))
+
+
+
+
 
