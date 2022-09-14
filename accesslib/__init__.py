@@ -12,7 +12,7 @@ class CFG:
     else:
         base_path = os.path.expanduser('~') + "/project/hubmap-organ-segmentation"
     print(f"base_path: {base_path}")
-    epochs_path = "/tmp"
+    epochs_path = "/tmp/model"
     img_size = (512, 512, 3)
     batch_size = 20
     epochs = 40
