@@ -82,18 +82,18 @@ if __name__ == "__main__":
     model = Model(input_layer, output_layer, loss=bce_dice_loss, metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
                   verbose=True).get_model()
 
-    wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
-    callbacks = create_callbacks(cfg.epochs_path,
-                                 wandb_flag=cfg.wandb_callback_flag,
-                                 wandb_test_name=cfg.wandb_test_name,
-                                 wandb_config=wandb_config)
-    history = model.fit(
-        train_gen,
-        steps_per_epoch=len(train_patch_paths) // cfg.batch_size,
-        epochs=cfg.epochs,
-        callbacks=callbacks,
-        validation_data=val_gen,
-        validation_steps=len(val_patch_paths) // cfg.batch_size,
-    )
-
-    model.save(os.path.join(cfg.epochs_path, 'complete_model'))
+    # wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
+    # callbacks = create_callbacks(cfg.epochs_path,
+    #                              wandb_flag=cfg.wandb_callback_flag,
+    #                              wandb_test_name=cfg.wandb_test_name,
+    #                              wandb_config=wandb_config)
+    # history = model.fit(
+    #     train_gen,
+    #     steps_per_epoch=len(train_patch_paths) // cfg.batch_size,
+    #     epochs=cfg.epochs,
+    #     callbacks=callbacks,
+    #     validation_data=val_gen,
+    #     validation_steps=len(val_patch_paths) // cfg.batch_size,
+    # )
+    #
+    # model.save(os.path.join(cfg.epochs_path, 'complete_model'))
