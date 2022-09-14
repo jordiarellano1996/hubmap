@@ -78,7 +78,7 @@ if __name__ == "__main__":
                             shuffle=True, augment=False, )
 
     # 🚀 Train
-    input_layer, output_layer = HalfUnet(img_shape=cfg.img_size).get_layers()
+    input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16).get_layers()
     model = Model(input_layer, output_layer, loss=bce_dice_loss, metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
                   verbose=True).get_model()
 
