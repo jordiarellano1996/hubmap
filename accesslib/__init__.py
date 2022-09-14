@@ -5,7 +5,8 @@ class CFG:
     seed = 25
     debug = False  # set debug=False for Full Training
     wandb_callback_flag = True
-    wandb_test_name = "no_augmentation_unet_filters_16"
+    wandb_test_name = "nAug_unet_f16"
+    GPU_name = '1x NVIDIA RTX A6000'
     debug_cases = 3
     if len(os.getcwd().split("/")) > 4:
         base_path = "/home/titoare/Documents/ds/hubmap/kaggle/input/hubmap-organ-segmentation"
@@ -14,8 +15,8 @@ class CFG:
     print(f"base_path: {base_path}")
     epochs_path = "/tmp/model"
     img_size = (512, 512, 3)
-    batch_size = 20
-    epochs = 10
+    batch_size = 64
+    epochs = 100
     n_fold = 7
 
 
