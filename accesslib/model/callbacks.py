@@ -21,6 +21,6 @@ def create_callbacks(path, wandb_flag=False, wandb_test_name="NoTestName", wandb
     if wandb_flag:
         wandb.login(relogin=True, key="52fb822f6a358eedc0a801169d4b00b63ffa125f")
         wandb.init(project="HuBMAP", entity="jordiarellano1996", name=wandb_test_name, config=wandb_config)
-        return [early_stop, WandbCallback()]
+        return [early_stop, checkpoint, WandbCallback()]
     else:
-        return [early_stop]
+        return [early_stop, checkpoint]

@@ -9,12 +9,12 @@ import albumentations as albu
 class DataGenerator(tf.keras.utils.Sequence):
     """Generates data for Keras"""
 
-    def __init__(self, img_path: list, mask_path: list, batch_size=24, shuffle=False, augment=False,
-                 crops=1, size=512, size2=512, shrink=1):
+    def __init__(self, img_path: list, mask_path: list, batch_size: int = 24, shuffle: bool = False,
+                 augment: bool = False, crops: int = 1, size: int = 512, size2: int = 512, shrink: int = 1):
         """
         If augmentation == True
             size: Final crop size, placed in '__random_transform'
-            size2: Might be higher than 'size', is the first crop.
+            size2: Might be higher or equal than 'size', is the first crop.
         If augmentation == False
             size: Windows "mask up finder" size.
             size2: Final crop size.
@@ -43,7 +43,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         ct = int(np.ceil(self.crops * len(self.img_paths) / self.batch_size))
         return ct
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         """Generate one batch of data"""
         indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
         x, y = self.__data_generation(indexes)
@@ -64,7 +64,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         if self.shuffle:
             np.random.shuffle(self.indexes)
 
-    def __data_generation(self, indexes):
+    def __data_generation(self, indexes: list):
         """Generates data containing batch_size samples"""
 
         x = np.zeros((len(indexes), self.size2, self.size2, 3), dtype='float32')
@@ -92,8 +92,6 @@ class DataGenerator(tf.keras.utils.Sequence):
                 if sm < pct:
                     sm = 0
 
-                if ct >= ct_threshold-1:
-                    print(f"ct up of {ct_threshold}")
                 ct += 1
 
             x[k,] = img[a:a + self.size2 * self.shrink, b:b + self.size2 * self.shrink, ][::self.shrink,
@@ -122,7 +120,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         img_batch2 = np.zeros((len(img_batch), self.size, self.size, 3), dtype='float32')
         mask_batch2 = np.zeros((len(mask_batch), self.size, self.size, 1), dtype='float32')
         for i in range(img_batch.shape[0]):
-            img_batch2[i, ], mask_batch2[i, ] = self.__random_transform(img_batch[i, ], mask_batch[i, ])
+            img_batch2[i,], mask_batch2[i,] = self.__random_transform(img_batch[i,], mask_batch[i,])
         return img_batch2, mask_batch2
 
 
