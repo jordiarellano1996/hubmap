@@ -19,3 +19,15 @@ def read_image(path):
 
 def img_rescale(img):
     return (img * (1. / 255)).astype('float32')
+
+
+def read_img_from_disk(img_paths: list, mask_paths: list) -> tuple:
+    """ Read images and move to RAM """
+    assert len(img_paths) == len(mask_paths)
+
+    img_arr = []
+    mask_arr = []
+    for pos in range(len(img_paths)):
+        img_arr.append(read_image(img_paths[pos]))
+        mask_arr.append(read_image(mask_paths[pos]))
+    return img_arr, mask_arr

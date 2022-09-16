@@ -6,13 +6,16 @@ print(sys_path)
 sys.path.append(sys_path)
 
 import pandas as pd
+import numpy as np
+from sklearn.model_selection import StratifiedKFold
 from accesslib import CFG
 from accesslib.data_loader import DataGenerator
 from accesslib.model.unet import Unet, Model, HalfUnet
 from accesslib.model.callbacks import create_callbacks
 from accesslib.model.custom_metrics import bce_dice_loss, dice_coef, iou_coef, jacard_coef, bce_loss
 from accesslib.model.gpu import configure_gpu_memory_allocation, print_devices
-from sklearn.model_selection import StratifiedKFold
+from accesslib.segmentation_precompute.read_image import read_img_from_disk
+
 
 """0: Debug, 1: No Info, 2: No info/warnings, 3: No info/warnings/error logged."""
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -31,6 +34,8 @@ if __name__ == "__main__":
 
     # 🚀 Load data set
     df = pd.read_pickle(os.path.join(cfg.base_path, "train_precompute.csv"))
+    if cfg.debug:
+        df = df.iloc[np.random.randint(350, size=(cfg.debug_cases, ))]
 
     # 🚀 Cross validation
     """
@@ -62,10 +67,14 @@ if __name__ == "__main__":
     val_img_paths = replace_path(val_img_paths, old_path, cfg.base_path)
     val_mask_paths = replace_path(val_mask_paths, old_path, cfg.base_path)
 
+    #  🚀 Store images and mask on ram.
+    train_img, train_mask = read_img_from_disk(train_img_paths, train_mask_paths)
+    val_img, val_mask = read_img_from_disk(val_img_paths, val_mask_paths)
+
     # 🚀 Getting generators
-    train_gen = DataGenerator(train_img_paths, train_mask_paths, batch_size=cfg.batch_size, shuffle=True, augment=True,
+    train_gen = DataGenerator(train_img, train_mask, batch_size=cfg.batch_size, shuffle=True, augment=True,
                               crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
-    val_gen = DataGenerator(val_img_paths, val_mask_paths, batch_size=cfg.batch_size, shuffle=True, augment=True,
+    val_gen = DataGenerator(val_img, val_mask, batch_size=cfg.batch_size, shuffle=True, augment=True,
                             crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
 
     # 🚀 Train
