@@ -18,7 +18,7 @@ from accesslib.segmentation_precompute.read_image import read_img_from_disk
 
 """0: Debug, 1: No Info, 2: No info/warnings, 3: No info/warnings/error logged."""
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 def replace_path(str_path_list, old_paths, new_path):

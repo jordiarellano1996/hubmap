@@ -1,6 +1,7 @@
 """ Custom Metrics Module """
 import tensorflow as tf
 from keras import backend as K
+import numpy as np
 
 
 def jacard_coef(y_true, y_pred):
@@ -36,8 +37,16 @@ def dice_loss(y_true, y_pred):
     return 1. - score
 
 
+def add_ax_id_need(y):
+    if len(y.shape) < 3:
+        print("problemaaaaaaaaaa")
+        y = y[:, :, np.newaxis]
+    return y
+
+
 def bce_dice_loss(y_true, y_pred):
-    print(y_true.shape, y_pred.shape)
+    y_true = add_ax_id_need(y_true)
+    y_pred = add_ax_id_need(y_pred)
     return tf.keras.losses.binary_crossentropy(tf.cast(y_true, tf.float32), y_pred) + 0.5 * dice_loss(
         tf.cast(y_true, tf.float32), y_pred)
 
