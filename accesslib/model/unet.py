@@ -9,7 +9,7 @@ from tensorflow.keras.layers import Conv1D, Conv2D, Conv2DTranspose, UpSampling2
 class UnetBase:
     def conv_block(self, tensor, nfilters, size=3, drop_out=0.1, padding='same', activation="relu"):
         x = Conv2D(filters=nfilters, kernel_size=(size, size), padding=padding, activation=activation, )(tensor)
-        x = Dropout(drop_out)(x)
+        #x = Dropout(drop_out)(x)
         x = Conv2D(filters=nfilters, kernel_size=(size, size), padding=padding, activation=activation, )(x)
         return x
 
