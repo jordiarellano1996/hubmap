@@ -4,7 +4,7 @@ import os
 class CFG:
     seed = 25
     debug = True  # set debug=False for Full Training
-    debug_cases = 10
+    debug_cases = 20
     wandb_callback_flag = True
     wandb_test_name = "try_overtfit_newdataloader_Aug_unet_f16_do0.0"
     GPU_name = '1x NVIDIA RTX A6000'
@@ -18,7 +18,7 @@ class CFG:
     crops = 30  # How many random crops for each image.
     batch_size = 32
     epochs = 30
-    learning_rate = 0.001
+    learning_rate = 0.0001
     n_fold = 2
 
 

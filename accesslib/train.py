@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     # 🚀 Train
     input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.).get_layers()
-    model = Model(input_layer, output_layer, loss="binary_crossentropy", metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
+    model = Model(input_layer, output_layer, loss="categorical_crossentropy", metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
                   verbose=True, learning_rate=cfg.learning_rate).get_model()
 
 
