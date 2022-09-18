@@ -10,15 +10,11 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from accesslib import CFG
 from accesslib.data_loader import DataGenerator
-from accesslib.model.unet import Unet, Model, HalfUnet
+from accesslib.model.unet import Unet, Model
 from accesslib.model.callbacks import create_callbacks
 from accesslib.model.custom_metrics import bce_dice_loss, dice_coef, iou_coef, jacard_coef, bce_loss
 from accesslib.model.gpu import configure_gpu_memory_allocation, print_devices
 from accesslib.segmentation_precompute.read_image import read_img_from_disk
-
-"""0: Debug, 1: No Info, 2: No info/warnings, 3: No info/warnings/error logged."""
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 def replace_path(str_path_list, old_paths, new_path):
@@ -49,12 +45,8 @@ if __name__ == "__main__":
     del fold, train_idx, val_idx, skf
 
     FOLD = 0
-    # train = df.iloc[cross_index[0][0]]
-    # validation = df.iloc[cross_index[0][1]]
-    train_id = df.id.unique()[:-2]
-    val_id = df.id.unique()[-2:]
-    train = df[df['id'].isin(train_id)]
-    validation = df[df['id'].isin(val_id)]
+    train = df.iloc[cross_index[0][0]]
+    validation = df.iloc[cross_index[0][1]]
 
     # 🚀 Get patches paths
     train_img_paths = train.img_path.values
@@ -75,22 +67,24 @@ if __name__ == "__main__":
     val_img, val_mask = read_img_from_disk(val_img_paths, val_mask_paths)
 
     # 🚀 Getting generators
-    train_gen = DataGenerator(train_img, train_mask, batch_size=cfg.batch_size, shuffle=True, augment=False,
-                              crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
+    train_gen = DataGenerator(train_img, train_mask, batch_size=cfg.batch_size, shuffle=True, augment=True,
+                              crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0])
     val_gen = DataGenerator(val_img, val_mask, batch_size=cfg.batch_size, shuffle=True, augment=False,
-                            crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
+                            crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0])
 
     # 🚀 Train
-    input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.).get_layers()
-    model = Model(input_layer, output_layer, loss=bce_dice_loss,
+    input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.0).get_layers()
+    model = Model(input_layer, output_layer, loss="binary_crossentropy",
                   metrics=[dice_coef, iou_coef, jacard_coef, bce_loss], verbose=True,
-                  learning_rate=cfg.learning_rate).get_model()
+                  learning_rate=cfg.learning_rate).get_model()  # "binary_crossentropy"
 
     wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
+
     callbacks = create_callbacks(cfg.epochs_path,
                                  wandb_flag=cfg.wandb_callback_flag,
                                  wandb_test_name=cfg.wandb_test_name,
                                  wandb_config=wandb_config)
+
     history = model.fit(
         train_gen,
         steps_per_epoch=(len(train_img_paths) * cfg.crops) // cfg.batch_size,

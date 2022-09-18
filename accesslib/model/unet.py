@@ -1,15 +1,16 @@
 """
 Standard Unet
 """
+import sys
 import tensorflow as tf
 from tensorflow.keras.layers import Conv1D, Conv2D, Conv2DTranspose, UpSampling2D, MaxPooling2D, Input, Dropout, \
-    concatenate
+    concatenate, Dense
 
 
 class UnetBase:
     def conv_block(self, tensor, nfilters, size=3, drop_out=0.1, padding='same', activation="relu"):
         x = Conv2D(filters=nfilters, kernel_size=(size, size), padding=padding, activation=activation, )(tensor)
-        #x = Dropout(drop_out)(x)
+        x = Dropout(drop_out)(x)
         x = Conv2D(filters=nfilters, kernel_size=(size, size), padding=padding, activation=activation, )(x)
         return x
 
@@ -68,7 +69,6 @@ class HalfUnet(UnetBase):
         # Input
         input_layer = Input(shape=(self.img_shape[0], self.img_shape[1], self.img_shape[2]), name='image_input')
         # Down
-
         conv1 = self.conv_block(input_layer, size=3, nfilters=self.filters)
         conv1_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv1)
         conv2 = self.conv_block(conv1_out, size=3, nfilters=self.filters)
@@ -90,6 +90,7 @@ class HalfUnet(UnetBase):
         # output
         output_layer = Conv2D(filters=self.n_classes, kernel_size=(1, 1), activation="sigmoid", padding='same')(
             conv6_out)
+
         return input_layer, output_layer
 
 
@@ -104,13 +105,24 @@ class Model:
         self.output_layer = output_layer
 
     def get_model(self):
-        model = tf.keras.Model(inputs=[self.input_layer], outputs=[self.output_layer])
+        model = tf.keras.Model(inputs=self.input_layer, outputs=self.output_layer)  # [self.input_layer]
+        # model = PrintEveryBatch(model.input, model.output)
         opt = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
         model.compile(optimizer=opt,
-                      loss=self.loss, metrics=self.metrics,
-                      )
+                            loss=self.loss, metrics=self.metrics, )
 
         if self.verbose:
             print(model.summary())
 
         return model
+
+
+class PrintEveryBatch(tf.keras.Model):
+    def train_step(self, data):
+        x, y = data
+        tf.print(f"\n", output_stream=sys.stdout)
+        tf.print("Input layer shape:", tf.shape(x), output_stream=sys.stdout)
+        tf.print("Output layer shape:", tf.shape(y), output_stream=sys.stdout)
+        tf.print("Input mean Tensorflow:", tf.reduce_mean(x), output_stream=sys.stdout)
+        tf.print("Output mean Tensorflow:", tf.reduce_mean(x), output_stream=sys.stdout)
+        return super().train_step(data)

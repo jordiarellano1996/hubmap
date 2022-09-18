@@ -37,16 +37,8 @@ def dice_loss(y_true, y_pred):
     return 1. - score
 
 
-def add_ax_id_need(y):
-    if len(y.shape) < 3:
-        print("problemaaaaaaaaaa")
-        y = y[:, :, np.newaxis]
-    return y
-
-
 def bce_dice_loss(y_true, y_pred):
-    y_true = add_ax_id_need(y_true)
-    y_pred = add_ax_id_need(y_pred)
+    # K.print_tensor(tf.math.reduce_all(tf.equal(y_true, y_true)))
     return tf.keras.losses.binary_crossentropy(tf.cast(y_true, tf.float32), y_pred) + 0.5 * dice_loss(
         tf.cast(y_true, tf.float32), y_pred)
 

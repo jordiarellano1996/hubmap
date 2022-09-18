@@ -7,7 +7,7 @@ class DataGenerator(tf.keras.utils.Sequence):
     """Generates data for Keras"""
 
     def __init__(self, img_list: list, mask_list: list, batch_size: int = 24, shuffle: bool = False,
-                 augment: bool = False, crops: int = 1, size: int = 512, size2: int = 512, shrink: int = 1):
+                 augment: bool = False, crops: int = 1, size: int = 512, size2: int = 512):
         """
         If augmentation == True
             size: Final crop size, placed in '__random_transform'
@@ -15,7 +15,6 @@ class DataGenerator(tf.keras.utils.Sequence):
         If augmentation == False
             size: Windows "mask up finder" size.
             size2: Final crop size.
-        shrink: Reduced image by either 1x, 2x, 3x, or 4x using a Numpy.
         crops: How many random crops with mask data for each image, minimum value 1.
         """
 
@@ -28,7 +27,6 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.crops = crops
         self.size = size
         self.size2 = size2
-        self.shrink = shrink
         self.shuffle = shuffle
         self.augment = augment
         # Model.fit in each epoch it may create again the class so "self.on_epoch_end()" should be called in each epoch.
@@ -81,20 +79,18 @@ class DataGenerator(tf.keras.utils.Sequence):
             pct = 10  # percentage of pixels up threshold.
             ct_threshold = 25
             while (sm == 0) & (ct < ct_threshold):
-                a = np.random.randint(0, img.shape[0] - self.size2 * self.shrink)
-                b = np.random.randint(0, img.shape[1] - self.size2 * self.shrink)
+                a = np.random.randint(0, img.shape[0] - self.size2)
+                b = np.random.randint(0, img.shape[1] - self.size2)
                 # sm = np.sum()
-                flatten_mask = mask[a:a + self.size * self.shrink, b:b + self.size * self.shrink].flatten()
+                flatten_mask = mask[a:a + self.size, b:b + self.size].flatten()
                 sm = int((len(flatten_mask[flatten_mask == 255]) / len(flatten_mask)) * 100)
                 if sm < pct:
                     sm = 0
 
                 ct += 1
 
-            x[k,] = img[a:a + self.size2 * self.shrink, b:b + self.size2 * self.shrink, ][::self.shrink,
-                    ::self.shrink] / 255.
-            y[k,] = mask[a:a + self.size2 * self.shrink, b:b + self.size2 * self.shrink][::self.shrink,
-                    ::self.shrink] / 255.
+            x[k, ] = img[a:a + self.size2, b:b + self.size2, ] / 255.
+            y[k, ] = mask[a:a + self.size2, b:b + self.size2, ] / 255.
 
             k += 1
 
