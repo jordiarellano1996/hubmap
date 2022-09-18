@@ -77,7 +77,7 @@ if __name__ == "__main__":
     # 🚀 Getting generators
     train_gen = DataGenerator(train_img, train_mask, batch_size=cfg.batch_size, shuffle=True, augment=False,
                               crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
-    val_gen = DataGenerator(val_img, val_mask, batch_size=cfg.batch_size, shuffle=True, augment=False,
+    val_gen = DataGenerator(val_img, val_mask, batch_size=cfg.batch_size, shuffle=True, augment=True,
                             crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
 
     # 🚀 Train

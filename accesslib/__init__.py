@@ -16,7 +16,7 @@ class CFG:
     epochs_path = "/tmp/model"
     img_size = (512, 512, 3)
     crops = 30  # How many random crops for each image.
-    batch_size = 1
+    batch_size = 32
     epochs = 30
     learning_rate = 0.0001
     n_fold = 2
