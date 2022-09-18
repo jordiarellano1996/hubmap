@@ -77,13 +77,13 @@ if __name__ == "__main__":
     # 🚀 Getting generators
     train_gen = DataGenerator(train_img, train_mask, batch_size=cfg.batch_size, shuffle=True, augment=False,
                               crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
-    val_gen = DataGenerator(val_img, val_mask, batch_size=cfg.batch_size, shuffle=True, augment=True,
+    val_gen = DataGenerator(val_img, val_mask, batch_size=cfg.batch_size, shuffle=True, augment=False,
                             crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
 
     # 🚀 Train
     input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.).get_layers()
-    model = Model(input_layer, output_layer, loss="binary_crossentropy",
-                  metrics=['accuracy', dice_coef, iou_coef, jacard_coef, bce_loss], verbose=True,
+    model = Model(input_layer, output_layer, loss=bce_dice_loss,
+                  metrics=[dice_coef, iou_coef, jacard_coef, bce_loss], verbose=True,
                   learning_rate=cfg.learning_rate).get_model()
 
     wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}

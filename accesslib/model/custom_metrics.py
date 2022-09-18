@@ -37,6 +37,7 @@ def dice_loss(y_true, y_pred):
 
 
 def bce_dice_loss(y_true, y_pred):
+    print(y_true.shape, y_pred.shape)
     return tf.keras.losses.binary_crossentropy(tf.cast(y_true, tf.float32), y_pred) + 0.5 * dice_loss(
         tf.cast(y_true, tf.float32), y_pred)
 
