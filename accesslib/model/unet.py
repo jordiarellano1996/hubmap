@@ -2,7 +2,8 @@
 Standard Unet
 """
 import tensorflow as tf
-from tensorflow.keras.layers import Conv1D, Conv2D, Conv2DTranspose, UpSampling2D, MaxPooling2D, Input, Dropout, concatenate
+from tensorflow.keras.layers import Conv1D, Conv2D, Conv2DTranspose, UpSampling2D, MaxPooling2D, Input, Dropout, \
+    concatenate
 
 
 class UnetBase:
@@ -70,13 +71,13 @@ class HalfUnet(UnetBase):
 
         conv1 = self.conv_block(input_layer, size=3, nfilters=self.filters)
         conv1_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv1)
-        conv2 = self.conv_block(conv1_out, size=3,  nfilters=self.filters)
+        conv2 = self.conv_block(conv1_out, size=3, nfilters=self.filters)
         conv2_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv2)
-        conv3 = self.conv_block(conv2_out, size=3,  nfilters=self.filters)
+        conv3 = self.conv_block(conv2_out, size=3, nfilters=self.filters)
         conv3_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv3)
-        conv4 = self.conv_block(conv3_out, size=3,  nfilters=self.filters)
+        conv4 = self.conv_block(conv3_out, size=3, nfilters=self.filters)
         conv4_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv4)
-        conv5 = self.conv_block(conv4_out, size=3,  nfilters=self.filters)
+        conv5 = self.conv_block(conv4_out, size=3, nfilters=self.filters)
 
         # Up
         deconv6 = UpSampling2D(size=(2, 2))(conv5)
@@ -87,7 +88,8 @@ class HalfUnet(UnetBase):
         conv6_out = self.conv_block(conv6, size=3, nfilters=self.filters)
 
         # output
-        output_layer = Conv2D(filters=self.n_classes, kernel_size=(1, 1), activation="sigmoid", padding='same')(conv6_out)
+        output_layer = Conv2D(filters=self.n_classes, kernel_size=(1, 1), activation="sigmoid", padding='same')(
+            conv6_out)
         return input_layer, output_layer
 
 
@@ -112,3 +114,90 @@ class Model:
             print(model.summary())
 
         return model
+
+
+from accesslib.model.custom_metrics import bce_dice_loss, dice_coef, iou_coef, jacard_coef, bce_loss
+
+
+def create_model(n_classes=1, img_height=512, img_width=512, img_channels=3, verbose=True):
+    """
+    :return:
+    """
+    """
+    UpSampling2D is just a simple scaling up of the image by using nearest neighbour or bilinear upsampling,
+    so nothing smart. Advantage is it's cheap.
+    Conv2DTranspose is a convolution operation whose kernel is learnt (just like normal conv2d operation) while
+    training your model. Using Conv2DTranspose will also upsample its input but the key difference is the
+    model should learn what is the best upsampling for the job.
+    """
+    # Input layer
+    input_layer = Input((img_height, img_width, img_channels))
+
+    # Encoding path
+    c1 = Conv2D(filters=16, kernel_size=(3, 3), activation="relu", padding='same')(input_layer)
+    c1 = Dropout(0.1)(c1)
+    c1 = Conv2D(filters=16, kernel_size=(3, 3), activation="relu", padding='same')(c1)
+    p1 = MaxPooling2D((2, 2), strides=(2, 2))(c1)
+
+    c2 = Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding='same')(p1)
+    c2 = Dropout(0.1)(c2)
+    c2 = Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding='same')(c2)
+    p2 = MaxPooling2D((2, 2), strides=(2, 2))(c2)
+
+    c3 = Conv2D(filters=64, kernel_size=(3, 3), activation="relu", padding='same')(p2)
+    c3 = Dropout(0.1)(c3)
+    c3 = Conv2D(filters=64, kernel_size=(3, 3), activation="relu", padding='same')(c3)
+    p3 = MaxPooling2D((2, 2), strides=(2, 2))(c3)
+
+    c4 = Conv2D(filters=128, kernel_size=(3, 3), activation="relu", padding='same')(p3)
+    c4 = Dropout(0.2)(c4)
+    c4 = Conv2D(filters=128, kernel_size=(3, 3), activation="relu", padding='same')(c4)
+    p4 = MaxPooling2D((2, 2), strides=(2, 2))(c4)
+
+    # Lower layer
+    c5 = Conv2D(filters=256, kernel_size=(3, 3), activation="relu", padding='same')(p4)
+    c5 = Dropout(0.2)(c5)
+    c5 = Conv2D(filters=256, kernel_size=(3, 3), activation="relu", padding='same')(c5)
+
+    # Expansive path
+    u6 = Conv2DTranspose(filters=128, kernel_size=(2, 2), strides=(2, 2))(c5)
+    u6 = concatenate([u6, c4])
+    c6 = Conv2D(filters=128, kernel_size=(3, 3), activation="relu", padding='same')(u6)
+    c6 = Dropout(0.2)(c6)
+    c6 = Conv2D(filters=128, kernel_size=(3, 3), activation="relu", padding='same')(c6)
+
+    u7 = Conv2DTranspose(filters=64, kernel_size=(2, 2), strides=(2, 2))(c6)
+    u7 = concatenate([u7, c3])
+    c7 = Conv2D(filters=64, kernel_size=(3, 3), activation="relu", padding='same')(u7)
+    c7 = Dropout(0.1)(c7)
+    c7 = Conv2D(filters=64, kernel_size=(3, 3), activation="relu", padding='same')(c7)
+
+    u8 = Conv2DTranspose(filters=32, kernel_size=(2, 2), strides=(2, 2))(c7)
+    u8 = concatenate([u8, c2])
+    c8 = Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding='same')(u8)
+    c8 = Dropout(0.1)(c8)
+    c8 = Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding='same')(c8)
+
+    u9 = Conv2DTranspose(filters=16, kernel_size=(2, 2), strides=(2, 2))(c8)
+    u9 = concatenate([u9, c1])
+    c9 = Conv2D(filters=16, kernel_size=(3, 3), activation="relu", padding='same')(u9)
+    c9 = Dropout(0.1)(c9)
+    c9 = Conv2D(filters=16, kernel_size=(3, 3), activation="relu", padding='same')(c9)
+
+    # output = Conv1D(filters=3, kernel_size=1, strides=1, activation="sigmoid")(c9)
+    output = Conv2D(filters=n_classes, kernel_size=(1, 1), activation="sigmoid", padding='same')(
+        c9)  # hot encoded output
+
+    model = tf.keras.Model(inputs=[input_layer], outputs=[output])
+    opt = tf.keras.optimizers.Adam(learning_rate=0.001)
+    # 228 - Semantic segmentation of aerial (satellite) imagery using U-net
+    # If teh class are not balanced, you can compute class weights and applied to DiceLoss
+    # Check focal loss also
+    model.compile(optimizer=opt,
+                  loss=bce_dice_loss, metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
+                  )
+
+    if verbose:
+        print(model.summary())
+
+    return model

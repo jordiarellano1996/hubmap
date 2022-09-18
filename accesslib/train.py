@@ -10,12 +10,11 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from accesslib import CFG
 from accesslib.data_loader import DataGenerator
-from accesslib.model.unet import Unet, Model, HalfUnet
+from accesslib.model.unet import Unet, Model, HalfUnet, create_model
 from accesslib.model.callbacks import create_callbacks
 from accesslib.model.custom_metrics import bce_dice_loss, dice_coef, iou_coef, jacard_coef, bce_loss
 from accesslib.model.gpu import configure_gpu_memory_allocation, print_devices
 from accesslib.segmentation_precompute.read_image import read_img_from_disk
-
 
 """0: Debug, 1: No Info, 2: No info/warnings, 3: No info/warnings/error logged."""
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -35,7 +34,7 @@ if __name__ == "__main__":
     # 🚀 Load data set
     df = pd.read_pickle(os.path.join(cfg.base_path, "train_precompute.csv"))
     if cfg.debug:
-        df = df.iloc[np.random.randint(350, size=(cfg.debug_cases, ))]
+        df = df.iloc[np.random.randint(350, size=(cfg.debug_cases,))]
 
     # 🚀 Cross validation
     """
@@ -78,22 +77,23 @@ if __name__ == "__main__":
                             crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
 
     # 🚀 Train<
-    input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.).get_layers()
-    model = Model(input_layer, output_layer, loss=bce_dice_loss, metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
-                  verbose=True, learning_rate=cfg.learning_rate).get_model()
+    # input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.).get_layers()
+    # model = Model(input_layer, output_layer, loss=bce_dice_loss, metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
+    #               verbose=True, learning_rate=cfg.learning_rate).get_model()
+    model = create_model()
 
-    wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
-    callbacks = create_callbacks(cfg.epochs_path,
-                                 wandb_flag=cfg.wandb_callback_flag,
-                                 wandb_test_name=cfg.wandb_test_name,
-                                 wandb_config=wandb_config)
-    history = model.fit(
-        train_gen,
-        steps_per_epoch=(len(train_img_paths) * cfg.crops) // cfg.batch_size,
-        epochs=cfg.epochs,
-        callbacks=callbacks,
-        validation_data=val_gen,
-        validation_steps=(len(val_img_paths) * cfg.crops) // cfg.batch_size,
-    )
-
-    model.save(os.path.join(cfg.epochs_path, 'complete_model'))
+    # wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
+    # callbacks = create_callbacks(cfg.epochs_path,
+    #                              wandb_flag=cfg.wandb_callback_flag,
+    #                              wandb_test_name=cfg.wandb_test_name,
+    #                              wandb_config=wandb_config)
+    # history = model.fit(
+    #     train_gen,
+    #     steps_per_epoch=(len(train_img_paths) * cfg.crops) // cfg.batch_size,
+    #     epochs=cfg.epochs,
+    #     callbacks=callbacks,
+    #     validation_data=val_gen,
+    #     validation_steps=(len(val_img_paths) * cfg.crops) // cfg.batch_size,
+    # )
+    #
+    # model.save(os.path.join(cfg.epochs_path, 'complete_model'))
