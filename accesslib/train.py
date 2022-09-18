@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from accesslib import CFG
 from accesslib.data_loader import DataGenerator
-from accesslib.model.unet import Unet, Model, HalfUnet, create_model
+from accesslib.model.unet import Unet, Model, HalfUnet
 from accesslib.model.callbacks import create_callbacks
 from accesslib.model.custom_metrics import bce_dice_loss, dice_coef, iou_coef, jacard_coef, bce_loss
 from accesslib.model.gpu import configure_gpu_memory_allocation, print_devices
@@ -77,10 +77,10 @@ if __name__ == "__main__":
                             crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0], shrink=1)
 
     # 🚀 Train<
-    # input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.).get_layers()
-    # model = Model(input_layer, output_layer, loss=bce_dice_loss, metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
-    #               verbose=True, learning_rate=cfg.learning_rate).get_model()
-    model = create_model()
+    input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.).get_layers()
+    model = Model(input_layer, output_layer, loss=bce_dice_loss, metrics=[dice_coef, iou_coef, jacard_coef, bce_loss],
+                  verbose=True, learning_rate=cfg.learning_rate).get_model()
+
 
     wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
     callbacks = create_callbacks(cfg.epochs_path,
