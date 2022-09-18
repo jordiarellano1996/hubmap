@@ -4,9 +4,9 @@ import os
 class CFG:
     seed = 25
     debug = True  # set debug=False for Full Training
-    debug_cases = 100
+    debug_cases = 10
     wandb_callback_flag = True
-    wandb_test_name = "newdataloader_Aug_unet_f16"
+    wandb_test_name = "try_overtfit_newdataloader_Aug_unet_f16_do0.0"
     GPU_name = '1x NVIDIA RTX A6000'
     if len(os.getcwd().split("/")) > 4:
         base_path = "/home/titoare/Documents/ds/hubmap/kaggle/input/hubmap-organ-segmentation"
@@ -15,10 +15,11 @@ class CFG:
     print(f"base_path: {base_path}")
     epochs_path = "/tmp/model"
     img_size = (512, 512, 3)
-    crops = 100  # How many random crops for each image.
-    batch_size = 64
+    crops = 30  # How many random crops for each image.
+    batch_size = 32
     epochs = 30
-    n_fold = 7
+    learning_rate = 0.001
+    n_fold = 2
 
 
 __version__ = "unknown"
