@@ -49,8 +49,12 @@ if __name__ == "__main__":
     del fold, train_idx, val_idx, skf
 
     FOLD = 0
-    train = df.iloc[cross_index[0][0]]
-    validation = df.iloc[cross_index[0][1]]
+    # train = df.iloc[cross_index[0][0]]
+    # validation = df.iloc[cross_index[0][1]]
+    train_id = df.id.unique()[:-2]
+    val_id = df.id.unique()[-2:]
+    train = df[df['id'].isin(train_id)]
+    validation = df[df['id'].isin(val_id)]
 
     # 🚀 Get patches paths
     train_img_paths = train.img_path.values
@@ -78,21 +82,22 @@ if __name__ == "__main__":
 
     # 🚀 Train
     input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.).get_layers()
-    model = Model(input_layer, output_layer, loss="binary_crossentropy", metrics=['accuracy', dice_coef, iou_coef, jacard_coef, bce_loss], verbose=True, learning_rate=cfg.learning_rate).get_model()
+    model = Model(input_layer, output_layer, loss="binary_crossentropy",
+                  metrics=['accuracy', dice_coef, iou_coef, jacard_coef, bce_loss], verbose=True,
+                  learning_rate=cfg.learning_rate).get_model()
 
-
-    wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
-    callbacks = create_callbacks(cfg.epochs_path,
-                                 wandb_flag=cfg.wandb_callback_flag,
-                                 wandb_test_name=cfg.wandb_test_name,
-                                 wandb_config=wandb_config)
-    history = model.fit(
-        train_gen,
-        steps_per_epoch=(len(train_img_paths) * cfg.crops) // cfg.batch_size,
-        epochs=cfg.epochs,
-        callbacks=callbacks,
-        validation_data=val_gen,
-        validation_steps=(len(val_img_paths) * cfg.crops) // cfg.batch_size,
-    )
-
-    model.save(os.path.join(cfg.epochs_path, 'complete_model'))
+    # wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
+    # callbacks = create_callbacks(cfg.epochs_path,
+    #                              wandb_flag=cfg.wandb_callback_flag,
+    #                              wandb_test_name=cfg.wandb_test_name,
+    #                              wandb_config=wandb_config)
+    # history = model.fit(
+    #     train_gen,
+    #     steps_per_epoch=(len(train_img_paths) * cfg.crops) // cfg.batch_size,
+    #     epochs=cfg.epochs,
+    #     callbacks=callbacks,
+    #     validation_data=val_gen,
+    #     validation_steps=(len(val_img_paths) * cfg.crops) // cfg.batch_size,
+    # )
+    #
+    # model.save(os.path.join(cfg.epochs_path, 'complete_model'))

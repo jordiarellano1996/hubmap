@@ -15,9 +15,8 @@ class UnetBase:
 
     def deconv_block(self, tensor, residual, nfilters, size=3, padding='same', strides=(2, 2), activation="relu",
                      drop_out=0.1):
-        #y = Conv2DTranspose(nfilters, kernel_size=(size, size), strides=strides, padding=padding)(tensor)
-        #y = concatenate([y, residual])
-        y= concatenate([tensor, residual])
+        y = Conv2DTranspose(nfilters, kernel_size=(size, size), strides=strides, padding=padding)(tensor)
+        y = concatenate([y, residual])
         y = self.conv_block(y, nfilters, activation=activation, drop_out=drop_out)
         return y
 
@@ -38,21 +37,16 @@ class Unet(UnetBase):
         # Input
         input_layer = Input(shape=(self.img_shape[0], self.img_shape[1], self.img_shape[2]), name='image_input')
         # Down
-
-        # conv1 = self.conv_block(input_layer, size=3, nfilters=self.filters, drop_out=self.drop_out)
-        # conv1_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv1)
-        # conv2 = self.conv_block(conv1_out, size=3, nfilters=self.filters * 2, drop_out=self.drop_out)
-        # conv2_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv2)
-        # conv3 = self.conv_block(conv2_out, size=3, nfilters=self.filters * 4, drop_out=self.drop_out)
-        # conv3_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv3)
-        # conv4 = self.conv_block(conv3_out, size=3, nfilters=self.filters * 8, drop_out=self.drop_out)
-        # conv4_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv4)
-        # conv5 = self.conv_block(conv4_out, size=3, nfilters=self.filters * 16, drop_out=self.drop_out)
         conv1 = self.conv_block(input_layer, size=3, nfilters=self.filters, drop_out=self.drop_out)
-        conv2 = self.conv_block(conv1, size=3, nfilters=self.filters * 2, drop_out=self.drop_out)
-        conv3 = self.conv_block(conv2, size=3, nfilters=self.filters * 4, drop_out=self.drop_out)
-        conv4 = self.conv_block(conv3, size=3, nfilters=self.filters * 8, drop_out=self.drop_out)
-        conv5 = self.conv_block(conv4, size=3, nfilters=self.filters * 16, drop_out=self.drop_out)
+        conv1_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv1)
+        conv2 = self.conv_block(conv1_out, size=3, nfilters=self.filters * 2, drop_out=self.drop_out)
+        conv2_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv2)
+        conv3 = self.conv_block(conv2_out, size=3, nfilters=self.filters * 4, drop_out=self.drop_out)
+        conv3_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv3)
+        conv4 = self.conv_block(conv3_out, size=3, nfilters=self.filters * 8, drop_out=self.drop_out)
+        conv4_out = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(conv4)
+        conv5 = self.conv_block(conv4_out, size=3, nfilters=self.filters * 16, drop_out=self.drop_out)
+
         # up
         deconv6 = self.deconv_block(conv5, residual=conv4, nfilters=self.filters * 8, drop_out=self.drop_out)
         deconv7 = self.deconv_block(deconv6, residual=conv3, nfilters=self.filters * 4, drop_out=self.drop_out)
