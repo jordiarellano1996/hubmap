@@ -54,7 +54,7 @@ class Unet(UnetBase):
         deconv9 = self.deconv_block(deconv8, residual=conv1, nfilters=self.filters, drop_out=self.drop_out)
 
         # output
-        output_layer = Conv2D(filters=self.n_classes, kernel_size=(1, 1), activation="softmax", padding='same')(deconv9)
+        output_layer = Conv2D(filters=self.n_classes, kernel_size=(1, 1), activation="sigmoid", padding='same')(deconv9)
         return input_layer, output_layer
 
 
