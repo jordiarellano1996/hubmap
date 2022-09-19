@@ -17,7 +17,7 @@ class CFG:
     else:
         base_path = os.path.expanduser('~') + "/project/hubmap-organ-segmentation"
     print(f"base_path: {base_path}")
-    epochs_path = "/tmp/model1"
+    epochs_path = "/tmp/model"
     img_size = (640, 640, 3)
     crops = 50  # How many random crops for each image.
     batch_size = 64

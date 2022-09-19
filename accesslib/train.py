@@ -33,7 +33,7 @@ if __name__ == "__main__":
         df = df.iloc[np.random.randint(350, size=(cfg.debug_cases,))]
 
     # 🚀 Train test split
-    train, validation = train_test_split(df, test_size = 0.05, random_state=cfg.seed, stratify=df['organ'])
+    train, validation = train_test_split(df, test_size=0.05, random_state=cfg.seed, stratify=df['organ'])
 
     # 🚀 Get patches paths
     train_img_paths = train.img_path.values
@@ -61,8 +61,8 @@ if __name__ == "__main__":
 
     # 🚀 Train
     input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.0).get_layers()
-    model = Model(input_layer, output_layer, loss=dice_loss,
-                  metrics=["binary_crossentropy", iou_coef, jacard_coef, bce_loss], verbose=True,
+    model = Model(input_layer, output_layer, loss="binary_crossentropy",
+                  metrics=[iou_coef, jacard_coef, bce_loss, bce_dice_loss], verbose=True,
                   learning_rate=cfg.learning_rate).get_model()  # "binary_crossentropy"
 
     wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
