@@ -5,9 +5,9 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
 class CFG:
-    seed = 25
-    debug = False  # set debug=False for Full Training
-    debug_cases = 100
+    seed = 2021
+    debug = True  # set debug=False for Full Training
+    debug_cases = False
     wandb_callback_flag = True
     wandb_test_name = "Aug_unet_f16_do0.0"
     GPU_name = '1x NVIDIA RTX A6000'
@@ -22,7 +22,6 @@ class CFG:
     batch_size = 64
     epochs = 50
     learning_rate = 0.001
-    n_fold = 2
 
 
 __version__ = "unknown"
