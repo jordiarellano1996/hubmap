@@ -30,7 +30,7 @@ if __name__ == "__main__":
     # 🚀 Load data set
     df = pd.read_pickle(os.path.join(cfg.base_path, "train_precompute.csv"))
     if cfg.debug:
-        df = df.iloc[np.random.randint(350, size=(10,))] #cfg.debug_cases
+        df = df.iloc[np.random.randint(350, size=(cfg.debug_cases,))]
 
     # 🚀 Train test split
     train, validation = train_test_split(df, test_size=0.05, random_state=cfg.seed, stratify=df['organ'])
@@ -60,10 +60,25 @@ if __name__ == "__main__":
                             crops=cfg.crops, size=cfg.img_size[0], size2=cfg.img_size[0])
 
     # 🚀 Train
-    input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.0).get_layers()
-    model = Model(input_layer, output_layer, loss=bce_dice_loss,
-                  metrics=[iou_coef, jacard_coef, bce_coef, dice_coef], verbose=True,
-                  learning_rate=cfg.learning_rate).get_model()  # "binary_crossentropy"
+    # input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.0).get_layers()
+    # model = Model(input_layer, output_layer, loss=bce_dice_loss,
+    #               metrics=[iou_coef, jacard_coef, bce_coef, dice_coef], verbose=True,
+    #               learning_rate=cfg.learning_rate).get_model()  # "binary_crossentropy"
+
+    # 🚀 Load model
+    from keras.models import load_model
+    """ if you use custom metrics to evaluate the model, when you loaded you must pass
+     custom objects instead you will get an error."""
+    custom_objects = custom_objects = {
+        'bce_dice_loss': bce_dice_loss,
+        'dice_coef': dice_coef,
+        'iou_coef': iou_coef,
+        "jacard_coef": jacard_coef,
+        "bce_coef": bce_coef,
+    }
+    model = load_model(
+        "/tmp/model/RNN_Final-43-0.36033.model/",
+        custom_objects=custom_objects)
 
     wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}
 
