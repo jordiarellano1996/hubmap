@@ -12,7 +12,7 @@ from accesslib import CFG
 from accesslib.data_loader import DataGenerator
 from accesslib.model.unet import Unet, Model
 from accesslib.model.callbacks import create_callbacks
-from accesslib.model.custom_metrics import bce_dice_loss, dice_coef, iou_coef, jacard_coef, bce_loss, dice_loss
+from accesslib.model.custom_metrics import bce_dice_loss, dice_coef, iou_coef, jacard_coef, bce_coef
 from accesslib.model.gpu import configure_gpu_memory_allocation, print_devices
 from accesslib.segmentation_precompute.read_image import read_img_from_disk
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     # 🚀 Load data set
     df = pd.read_pickle(os.path.join(cfg.base_path, "train_precompute.csv"))
     if cfg.debug:
-        df = df.iloc[np.random.randint(350, size=(cfg.debug_cases,))]
+        df = df.iloc[np.random.randint(350, size=(10,))] #cfg.debug_cases
 
     # 🚀 Train test split
     train, validation = train_test_split(df, test_size=0.05, random_state=cfg.seed, stratify=df['organ'])
@@ -61,8 +61,8 @@ if __name__ == "__main__":
 
     # 🚀 Train
     input_layer, output_layer = Unet(img_shape=cfg.img_size, filters=16, drop_out=0.0).get_layers()
-    model = Model(input_layer, output_layer, loss="binary_crossentropy",
-                  metrics=[iou_coef, jacard_coef, bce_loss, bce_dice_loss], verbose=True,
+    model = Model(input_layer, output_layer, loss=bce_dice_loss,
+                  metrics=[iou_coef, jacard_coef, bce_coef, dice_coef], verbose=True,
                   learning_rate=cfg.learning_rate).get_model()  # "binary_crossentropy"
 
     wandb_config = {'competition': "HuBMAP", 'GPU_name': cfg.GPU_name, "batch_size": cfg.batch_size}

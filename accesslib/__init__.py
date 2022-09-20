@@ -10,7 +10,7 @@ class CFG:
     debug = False  # set debug=False for Full Training
     debug_cases = False
     wandb_callback_flag = True
-    wandb_test_name = "640x640_Aug_unet_f16_do0.0"
+    wandb_test_name = "bce_dice_640x640_Aug_unet_f16_do0.0"
     GPU_name = '1x NVIDIA RTX A6000'
     if len(os.getcwd().split("/")) > 4:
         base_path = "/home/titoare/Documents/ds/hubmap/kaggle/input/hubmap-organ-segmentation"
@@ -22,7 +22,7 @@ class CFG:
     crops = 50  # How many random crops for each image.
     batch_size = 64
     epochs = 50
-    learning_rate = 0.001
+    learning_rate = 0.0001
 
 
 __version__ = "unknown"

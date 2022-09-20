@@ -45,3 +45,7 @@ def bce_dice_loss(y_true, y_pred):
 
 def bce_loss(y_true, y_pred):
     return tf.keras.losses.binary_crossentropy(tf.cast(y_true, tf.float32), y_pred)
+
+
+def bce_coef(y_true, y_pred):
+    return tf.keras.metrics.binary_crossentropy(tf.cast(y_true, tf.float32), y_pred)
