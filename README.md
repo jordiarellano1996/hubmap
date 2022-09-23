@@ -40,7 +40,7 @@ Check results on: https://wandb.ai/jordiarellano1996/HuBMAP
 * All the other sizes (19) only have 1 or 2 occurrences each.
 * All image size are square
 
-**  NOTE: THE HOSTS TELL US THAT ALL HPA IMAGES SHOULD BE 3000x3000... HOWEVER, WE CAN SEE THAT ISN'T THE CASE **
+**NOTE: THE HOSTS TELL US THAT ALL HPA IMAGES SHOULD BE 3000x3000... HOWEVER, WE CAN SEE THAT ISN'T THE CASE**
 
 ### Other observations
 * Expect roughly 550 images in the hidden test set.
