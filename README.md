@@ -2,19 +2,19 @@
 # 🚀 Competition introduction
 
 The goal of this competition is to identify the locations of each 
- ** functional tissue unit (FTU) **  in biopsy slides from several different organs. The underlying data includes imagery from **  different sources **  prepared with ** 
- different protocols  **  at a ** variety of resolutions **, reflecting typical challenges for working with medical data. 
+ **functional tissue unit (FTU)**  in biopsy slides from several different organs. The underlying data includes imagery from **different source**  prepared with **different protocols** 
+at a **variety of resolutions**, reflecting typical challenges for working with medical data. 
 
-This competition uses data from two different consortia, ** the Human Reference Atlas (HPA) ** and  ** Human BioMolecular Atlas Program (HuBMAP) ** .
+This competition uses data from two different consortia, **the Human Reference Atlas (HPA)** and  **Human BioMolecular Atlas Program (HuBMAP)** .
 
 The data is sourced as following:
 * The training dataset consists of data from public HPA data.
 * The public test set is a combination of private HPA data and HuBMAP data.
 * The private test set contains only HuBMAP data.
 
-** Adapting models to function properly when presented with data that was prepared using a different protocol will
+**Adapting models to function properly when presented with data that was prepared using a different protocol will
 be one of the core challenges of this competition. While this is expected to make the problem more difficult,
-developing models that generalize is a key goal of this endeavor. **
+developing models that generalize is a key goal of this endeavor.**
 
 https://www.kaggle.com/competitions/hubmap-organ-segmentation
 
