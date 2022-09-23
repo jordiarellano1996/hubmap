@@ -91,20 +91,35 @@ def check_patches(patches_paths, mask_patches_paths, xy_shape=(6, 6), fig_size=(
     plt.show()
 
 
-# def read_image(path):
-#     """
-#     Reads and converts the image.
-#     path: the full complete path to the .png file
-#     """
-#
-#     # Read image in a corresponding manner
-#     # convert int16 -> float32
-#     image = cv2.imread(path, cv2.IMREAD_UNCHANGED).astype('float32')
-#     # Scale to [0, 255]
-#     if np.max(image) != np.min(image):
-#         image = cv2.normalize(image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-#
-#     image = image.astype(np.uint8)
-#     if len(image.shape) == 2:
-#         image = image[:, :, np.newaxis]
-#     return image
+def show_img_result(img, mask, pred_mask, bce_dice_loss, bce_coef, iou_coef, dice_coef, fig_size=(20, 10)):
+    fig, axs = plt.subplots(1, 3, figsize=fig_size)
+    axs = axs.flatten()
+    # Config title
+    print(bce_dice_loss, bce_coef, iou_coef, dice_coef)
+    title_arr = ["Input image", "Image & True_Mask", "Image & Predicted_Mask"]
+    axs[0].set_title(title_arr[0], fontsize=14, weight='bold')
+    axs[1].set_title(title_arr[1], fontsize=14, weight='bold')
+    axs[2].set_title(title_arr[
+                         2] + f"\nbce_dice_loss: {bce_dice_loss:.4}, bce_coef: {bce_coef:.4}\niou_coef: {iou_coef:.4},dice_coef: {dice_coef:.4}",
+                     fontsize=14, weight='bold')
+
+    # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    # img = clahe.apply(img)
+    axs[0].imshow(img, cmap='bone')
+    axs[0].axis('off')
+
+    # True mask plot
+    i = 1
+    for m in [mask, pred_mask]:
+        axs[i].imshow(img, cmap='bone')
+        axs[i].axis('off')
+
+        handles = [Rectangle((0, 0), 1, 1, color=_c) for _c in
+                   [(0.667, 0.0, 0.0), (0.0, 0.667, 0.0), (0.0, 0.0, 0.667)]]
+        labels = ["mask", ]
+        axs[i].legend(handles, labels)
+        axs[i].imshow(m, alpha=0.5 * (m[:, :, 0] / 255), cmap="bwr")
+        i += 1
+
+    plt.tight_layout()
+    plt.show()

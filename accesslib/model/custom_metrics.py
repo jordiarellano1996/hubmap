@@ -1,7 +1,6 @@
 """ Custom Metrics Module """
 import tensorflow as tf
 from keras import backend as K
-import numpy as np
 
 
 def jacard_coef(y_true, y_pred):

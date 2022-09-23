@@ -103,36 +103,36 @@ if __name__ == "__main__":
     #     rle.save_image_on_disk(np.uint8(mask * 255), target_row["mask_path"].values[0])
 
     """ 🤫 Generate patches for images """
-    # # Train images data
-    # patch_size = (512, 512)
-    # train.insert(5, "patches_path", train["img_path"])
-    # train["patches_path"].replace(["/train_images", ], ["/train_patches", ], regex=True, inplace=True)
-    # patches_path_out, new_shapes_out, patch_shapes_out, _ = patches_on_disk(train["img_path"].values,
-    #                                                                         train["patches_path"].values, patch_size)
-    # train["patches_path"] = patches_path_out
-    # train["new_shape"] = new_shapes_out
-    # train["patch_shape"] = patch_shapes_out
-    #
-    # # Train masks data
-    # train.insert(5, "pmask_path", train["img_path"])
-    # train["pmask_path"].replace(["/train_images", ], ["/train_pmask", ], regex=True, inplace=True)
-    # pmask_path_out, _, _, mask_consistency_index = patches_on_disk(train["mask_path"].values,
-    #                                                                train["pmask_path"].values, patch_size,
-    #                                                                mask_consistency_flag=True)
-    # train["pmask_path"] = pmask_path_out
-    # train["pmask_consistency"] = mask_consistency_index
-    #
-    # # Test images data
-    # test.insert(5, "patches_path", test["img_path"])
-    # test["patches_path"].replace(["/test_images", ], ["/test_patches", ], regex=True, inplace=True)
-    # patches_path_out, new_shapes_out, patch_shapes_out, _ = patches_on_disk(test["img_path"].values,
-    #                                                                         test["patches_path"].values, patch_size)
-    # test["patches_path"] = patches_path_out
-    # test["new_shape"] = new_shapes_out
-    # test["patch_shape"] = patch_shapes_out
+    # Train images data
+    patch_size = (512, 512)
+    train.insert(5, "patches_path", train["img_path"])
+    train["patches_path"].replace(["/train_images", ], ["/train_patches", ], regex=True, inplace=True)
+    patches_path_out, new_shapes_out, patch_shapes_out, _ = patches_on_disk(train["img_path"].values,
+                                                                            train["patches_path"].values, patch_size)
+    train["patches_path"] = patches_path_out
+    train["new_shape"] = new_shapes_out
+    train["patch_shape"] = patch_shapes_out
+
+    # Train masks data
+    train.insert(5, "pmask_path", train["img_path"])
+    train["pmask_path"].replace(["/train_images", ], ["/train_pmask", ], regex=True, inplace=True)
+    pmask_path_out, _, _, mask_consistency_index = patches_on_disk(train["mask_path"].values,
+                                                                   train["pmask_path"].values, patch_size,
+                                                                   mask_consistency_flag=True)
+    train["pmask_path"] = pmask_path_out
+    train["pmask_consistency"] = mask_consistency_index
+
+    # Test images data
+    test.insert(5, "patches_path", test["img_path"])
+    test["patches_path"].replace(["/test_images", ], ["/test_patches", ], regex=True, inplace=True)
+    patches_path_out, new_shapes_out, patch_shapes_out, _ = patches_on_disk(test["img_path"].values,
+                                                                            test["patches_path"].values, patch_size)
+    test["patches_path"] = patches_path_out
+    test["new_shape"] = new_shapes_out
+    test["patch_shape"] = patch_shapes_out
 
     """ 🤫 Save custom train dataset """
     # train.to_csv(os.path.join(cfg.base_path, "train_precompute.csv"), index=False)
     # test.to_csv(os.path.join(cfg.base_path, "test_precompute.csv"), index=False)
-    train.to_pickle(os.path.join(cfg.base_path, "train_precompute.csv"))
-    test.to_pickle(os.path.join(cfg.base_path, "test_precompute.csv"))
+    train.to_pickle(os.path.join(cfg.base_path, "train_precompute_patches.csv"))
+    test.to_pickle(os.path.join(cfg.base_path, "test_precompute_patches.csv"))

@@ -3,7 +3,7 @@ import pandas as pd
 from accesslib import CFG
 from accesslib import data_loader
 from importlib import reload
-from accesslib.plot_factory.images import show_img
+from accesslib.plot_factory.images import show_img, show_img_result
 import numpy as np
 from accesslib.segmentation_precompute.read_image import read_image
 from accesslib.model.custom_metrics import bce_dice_loss, dice_coef, iou_coef, jacard_coef, bce_loss, bce_coef
@@ -16,7 +16,9 @@ if __name__ == "__main__":
 
     # 🚀 Load data set
     df = pd.read_pickle(os.path.join(cfg.base_path, "train_precompute.csv"))
-    df = df.iloc[np.random.randint(350, size=(10,))]
+    print(df.organ.unique())
+    df = df[df.organ == "largeintestine"]
+    df = df.iloc[np.random.randint(len(df), size=(10,))]
 
     # 🚀 Get image and mask paths
     img_paths = df.img_path.values
@@ -41,24 +43,27 @@ if __name__ == "__main__":
         'dice_coef': dice_coef,
         'iou_coef': iou_coef,
         "jacard_coef": jacard_coef,
-        "bce_loss": bce_loss,
+        "bce_coef": bce_coef,
     }
     out_model = load_model(
-        "/home/titoare/Documents/ds/hubmap/models/640x640_Aug_unet_f16",
+        "/home/titoare/Documents/ds/hubmap/models/2_bce_dice_640x640_Aug_unet_f16_0.36033_0.32320",
         custom_objects=custom_objects)
 
     # 🚀 Evaluate
     for i in range(10):
         x, y = gen[i]
-        show_img((x[0] * 255).astype('uint8'), (y[0] * 255).astype('uint8'), mask_labels=[f"{i}"])
         pred_mask = out_model.predict(x)
-        print(f"-----------------------------{i}-----------------------------")
-        print(f"BCE coefficient: {np.mean(bce_coef(y, pred_mask))}")
-        print(f"Dice coefficient: {np.mean(dice_coef(y, pred_mask))}")
-        print(f"Iou coefficient: {np.mean(iou_coef(y, pred_mask))}")
-        print(f"bce_dice_loss: {np.mean(bce_dice_loss(y, pred_mask))}")
-
-        # For plot
+        bce_coef_v = np.mean(bce_coef(y, pred_mask))
+        dice_coef_v = np.mean(dice_coef(y, pred_mask))
+        iou_coef_v = np.mean(iou_coef(y, pred_mask))
+        bce_dice_loss_v = np.mean(bce_dice_loss(y, pred_mask))
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: ", np.max(pred_mask), np.max(y))
         pred_mask = np.uint8(pred_mask > 0.5)
-        show_img((x[0] * 255).astype('uint8'), (pred_mask[0] * 255).astype('uint8'), mask_labels=[f"{i}"])
-        print("--------------------------------------------------------------")
+        # Plot
+        show_img_result((x[0] * 255).astype('uint8'),
+                        (y[0] * 255).astype('uint8'),
+                        (pred_mask[0] * 255).astype('uint8'),
+                        bce_dice_loss_v,
+                        bce_coef_v,
+                        iou_coef_v,
+                        dice_coef_v)

@@ -96,7 +96,7 @@ if __name__ == "__main__":
     cfg = CFG()
 
     """ 🤫 Load data set """
-    train = pd.read_pickle(os.path.join(cfg.base_path, "train_precompute.csv"))
+    train = pd.read_pickle(os.path.join(cfg.base_path, "train_precompute_patches.csv"))
 
     """ 🤫 Number of Segmentation Masks Per Organ Type """
     hist_img_org = histogram(train, "organ", "organ", legend=True)
@@ -147,18 +147,4 @@ if __name__ == "__main__":
     patches_paths = t_df.patches_path.values[0]
     pmask_paths = t_df.pmask_path.values[0]
     xy_shape = t_df.patch_shape.values[0][:2]
-    images.check_patches(patches_paths, pmask_paths, xy_shape=xy_shape)
-
-    """ 🤫 Check data generator consistency"""
-    patch_paths = []
-    pmask_paths = []
-    for pos in range(len(train.patches_path)):
-        for p_index in train.pmask_consistency.values[pos]:
-            patch_paths.append(train.patches_path.values[pos][p_index])
-            pmask_paths.append(train.pmask_path.values[pos][p_index])
-
-    gen = data_loader.DataGenerator(patch_paths, pmask_paths, batch_size=32, shuffle=True, augment=False,img_size=(512,512,3) )
-    x, y = gen[22]
-    print(x.shape, y.shape)
-
-    images.show_img((x[5]*255).astype('uint8'), (y[5]*255).astype('uint8'), mask_labels=["organ"])
+    images.check_patches(patches_paths, pmask_paths, xy_shape=xy_shape, fig_size=(30, 30))
